@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="THE ONE PROD - Your ultimate source to download files, software, music, and more.">
+
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- Manifest for theme color -->
+  <link rel="manifest" href="manifest.json">
+
+  <title>THE ONE PROD</title>
+
+  <!-- Preload CSS and JS -->
+  <link rel="preload" href="styles.css" as="style">
+  <link rel="preload" href="script.js" as="script">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- FontAwesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+  <!-- Ionicons for additional vector icons -->
+  <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Main JavaScript -->
+  <script defer src="script.js"></script>
+</head>
+<body class="light-mode">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <h1 class="logo-text" data-key="logoText">THE ONE PROD</h1>
+      </div>
+      <div class="search-container">
+        <form onsubmit="return false;">
+          <input type="text" id="searchInput" placeholder="Search files..." aria-label="Search" oninput="filterResults()">
+          <button type="submit" aria-label="Start search"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="header-right">
+      <!-- Language Selector -->
+      <select id="languageSelector" aria-label="Select Language">
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
+      <!-- Dark Mode Toggle -->
+      <button id="darkModeToggle" aria-label="Toggle dark mode" class="dark-mode-toggle">
+        <i class="fas fa-moon"></i>
+      </button>
+      <!-- Categories Button -->
+      <button id="categoriesBtn" class="categories-btn" aria-label="Open Categories">
+        <i class="fas fa-th-large"></i> <span data-key="categoriesBtn">Categories</span>
+      </button>
+      <!-- Admin Login Button -->
+      <button id="adminLoginBtn" class="admin-btn">Admin Login</button>
+      <!-- Upload Music Button (affiché via CSS si admin connecté) -->
+      <button id="uploadMusicBtn" class="admin-btn">Upload Music</button>
+    </div>
+  </header>
+
+  <!-- MODALE DES CATEGORIES -->
+  <div id="categoriesModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <!-- Titre dynamique -->
+      <h2 id="modalTitle" data-key="modalTitle">Check Out All Amazing Software Categories For</h2>
+      <div class="category-options">
+        <button class="cat-option" data-cat="android-apps">
+          <i class="ion-social-android"></i> <span data-key="catAndroid">Android Apps</span>
+        </button>
+        <button class="cat-option" data-cat="ebooks">
+          <i class="ion-ios-book"></i> <span data-key="catEbooks">E‑Books</span>
+        </button>
+        <button class="cat-option" data-cat="macos">
+          <i class="ion-social-apple"></i> <span data-key="catMacos">MacOS</span>
+        </button>
+        <button class="cat-option" data-cat="windows">
+          <i class="ion-logo-windows"></i> <span data-key="catWindows">Windows</span>
+        </button>
+        <button class="cat-option" data-cat="video-courses">
+          <i class="ion-ios-videocam"></i> <span data-key="catVideo">Video Courses</span>
+        </button>
+        <button class="cat-option" data-cat="pc-games">
+          <i class="ion-ios-game-controller-b"></i> <span data-key="catPcGames">PC Games</span>
+        </button>
+        <button class="cat-option" data-cat="android-games">
+          <i class="ion-social-android"></i> <span data-key="catAndroidGames">Android Games</span>
+        </button>
+      </div>
+      <!-- Contenu dynamique de la catégorie sélectionnée -->
+      <div id="categoryDetails" class="category-details"></div>
+    </div>
+  </div>
+
+  <!-- MODALE ADMIN LOGIN -->
+  <div id="adminLoginModal" class="modal">
+    <div class="modal-content">
+      <span id="closeAdminLogin" class="close">&times;</span>
+      <h2>Admin Login</h2>
+      <form id="adminLoginForm">
+        <label>Username:<br>
+          <input type="text" id="adminUsername" required>
+        </label><br>
+        <label>Password:<br>
+          <input type="password" id="adminPassword" required>
+        </label><br>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODALE UPLOAD MUSIC -->
+  <div id="musicUploadModal" class="modal">
+    <div class="modal-content">
+      <span id="closeMusicUpload" class="close">&times;</span>
+      <h2>Upload Music</h2>
+      <form id="musicUploadForm">
+        <label>Title:<br>
+          <input type="text" id="musicTitle" required>
+        </label><br>
+        <label>Description:<br>
+          <textarea id="musicDescription" required></textarea>
+        </label><br>
+        <label>File:<br>
+          <input type="file" id="musicFile" accept="audio/*" required>
+        </label><br>
+        <button type="submit">Submit Music (Pending Approval)</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <!-- Bouton "View All" pour afficher les catégories -->
+    <button id="viewAllBtn" class="view-all" data-key="viewAll">View All</button>
+    <!-- Conteneur pour les catégories (style déplacé dans le CSS) -->
+    <div id="categoriesContainer">
+      <div class="content-left">
+        <section class="filter-section">
+          <h3 data-key="primaryCategories">Primary Categories</h3>
+          <div class="primary-container">
+            <ul id="primaryCategories">
+              <li data-cat="android-apps"><span class="select-marker"></span><i class="ion-social-android"></i> <span data-key="catAndroid">Android Apps</span></li>
+              <li data-cat="ebooks"><span class="select-marker"></span><i class="ion-ios-book"></i> <span data-key="catEbooks">E‑Books</span></li>
+              <li data-cat="macos"><span class="select-marker"></span><i class="ion-social-apple"></i> <span data-key="catMacos">MacOS</span></li>
+              <li data-cat="windows"><span class="select-marker"></span><i class="ion-logo-windows"></i> <span data-key="catWindows">Windows</span></li>
+              <li data-cat="video-courses"><span class="select-marker"></span><i class="ion-ios-videocam"></i> <span data-key="catVideo">Video Courses</span></li>
+              <li data-cat="pc-games"><span class="select-marker"></span><i class="ion-ios-game-controller-b"></i> <span data-key="catPcGames">PC Games</span></li>
+              <li data-cat="android-games"><span class="select-marker"></span><i class="ion-social-android"></i> <span data-key="catAndroidGames">Android Games</span></li>
+            </ul>
+          </div>
+          <hr>
+          <h4 data-key="subCategories">Sub Categories</h4>
+          <ul id="subCategories">
+            <!-- Les sous-catégories avec cases à cocher s'afficheront ici -->
+          </ul>
+          <div class="filter-options">
+            <button class="filter-btn" data-key="filterAll">All</button>
+            <button class="filter-btn" data-key="filterNewItem">New Item</button>
+            <button class="filter-btn" data-key="filterRecentUpdate">Recent Update</button>
+            <div class="dropdown-filter">
+              <span data-key="rating">Rating <i class="fas fa-chevron-down"></i></span>
+              <div class="dropdown-content">
+                <button data-filter="rating-high-low">High to Low</button>
+                <button data-filter="rating-low-high">Low to High</button>
+              </div>
+            </div>
+            <div class="dropdown-filter">
+              <span data-key="download">Download <i class="fas fa-chevron-down"></i></span>
+              <div class="dropdown-content">
+                <button data-filter="download-high-low">High to Low</button>
+                <button data-filter="download-low-high">Low to High</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="content-right">
+        <section class="items-section">
+          <header>
+            <h3 id="selectedCategoryTitle" data-key="selectedCategory">Selected Category</h3>
+          </header>
+          <div id="itemsContainer" class="items-container">
+            <!-- Les items s'afficheront ici dynamiquement -->
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-sections">
+      <div class="footer-section">
+        <h4 data-key="footerDownloadSoftware">Download Software</h4>
+        <ul>
+          <li>Windows</li>
+          <li>MacOS</li>
+          <li>Android APK</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 data-key="footerSupportCenter">Support Center</h4>
+        <ul>
+          <li>FAQs</li>
+          <li>Contact Us</li>
+          <li>Software Submission</li>
+          <li>Software Request</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 data-key="footerCompanyInfo">Company Info</h4>
+        <ul>
+          <li>About</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 data-key="footerDownloadOS">Download Operating Systems</h4>
+        <ul>
+          <li>Windows 11</li>
+          <li>Windows 10</li>
+          <li>Windows 8</li>
+          <li>Windows 7</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 data-key="footerCommonIssues">Common Issues</h4>
+        <ul>
+          <li>Ad Blocker</li>
+          <li>How To Download</li>
+          <li>Zip Password</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4 data-key="footerPartners">Partners</h4>
+        <ul>
+          <li>None</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-policies">
+        <span data-key="terms">Terms</span>
+        <span data-key="cookiesPolicy">Cookies Policy</span>
+        <span data-key="privacyPolicy">Privacy Policy</span>
+      </div>
+      <p data-key="footerCredit">© 2025 TheOnePRO. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- NOTIFICATIONS -->
+  <div id="notification" class="notification">Notification!</div>
+</body>
+</html>
